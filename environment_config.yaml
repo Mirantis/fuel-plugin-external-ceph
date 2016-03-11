@@ -1,0 +1,84 @@
+attributes:
+  metadata:
+    group: 'storage'
+
+  ceph_fsid:
+    value: 'aa6e4daa-9be1-4165-bf02-7d79e7779bf6'
+    label: 'Ceph Cluster FSID'
+    description: 'TODO'
+    weight: 1
+    type: 'text'
+  ceph_mons:
+    value: '192.168.0.3 192.168.0.5 192.168.0.4'
+    label: 'Ceph Mons IP Addresses'
+    description: 'TODO'
+    weight: 2
+    type: 'text'
+
+  glance_user:
+    value: 'glance'
+    label: 'Ceph User for Glance'
+    description: 'Username that Glance is going to use to access Ceph'
+    weight: 10
+    type: 'text'
+  glance_key:
+    value: ''
+    label: 'Ceph Key for Glance User'
+    description: 'Key that Glance is going to use to access Ceph'
+    weight: 15
+    type: 'password'
+  glance_pool:
+    value: 'images'
+    label: 'Ceph Pool Name for Glance'
+    description: 'Ceph pool, Glance will be storing images in'
+    weight: 20
+    type: 'text'
+
+  cinder_ceph:
+    value: True
+    label: 'Use Ceph as a backend for Cinder (Volumes)'
+    weight: 25
+    type: 'checkbox'
+  cinder_user:
+    value: 'cinder'
+    label: 'Ceph User for Cinder'
+    description: 'Username that Cinder is going to use to access Ceph'
+    weight: 30
+    type: 'text'
+  cinder_key:
+    value: ''
+    label: 'Ceph Key for Cinder'
+    description: 'Key that Cinder is going to use to access Ceph'
+    weight: 35
+    type: 'password'
+  cinder_pool:
+    value: 'volumes'
+    label: 'Ceph Pool Name for Cinder'
+    description: 'Ceph pool, Cinder will be storing Volumes in'
+    weight: 40
+    type: 'text'
+
+  nova_ceph:
+    value: True
+    label: 'Use Ceph as a backend for Nova Ephemeral Drives'
+    description: ''
+    weight: 45
+    type: 'checkbox'
+  nova_user:
+    value: 'nova'
+    label: 'Ceph User for Nova'
+    description: 'Username that Nova is going to use to access Ceph'
+    weight: 50
+    type: 'text'
+  nova_key:
+    value: ''
+    label: 'Ceph Key for Nova'
+    description: 'Key that Nova is going to use to access Ceph'
+    weight: 55
+    type: 'password'
+  nova_pool:
+    value: 'compute'
+    label: 'Ceph Pool Name for Nova'
+    description: 'Ceph pool, Nova will be storing Ephemeral Drives in'
+    weight: 60
+    type: 'text'

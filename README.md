@@ -1,0 +1,4 @@
+external-ceph
+============
+
+Plugin description

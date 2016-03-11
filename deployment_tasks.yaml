@@ -1,0 +1,28 @@
+# These tasks will be merged into deployment graph. Here you
+# can specify new tasks for any roles, even built-in ones.
+
+- id: ceph-conf
+  type: puppet
+  groups: [controller, compute]
+  required_for: [deploy_end]
+  requires: []
+  version: 2.0.0
+#  cross-depends:
+#    - name: primary-ceph-mon
+  parameters:
+    puppet_manifest: conf.pp
+    puppet_modules: puppet/mosules
+    timeout: 3600
+
+- id: ceph-volumes
+  type: puppet
+  groups: [controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [openstack-controller, ceph-conf]
+  version: 2.0.0
+#  cross-depends:
+#    - name: primary-ceph-mon
+  parameters:
+    puppet_manifest: volumes.pp
+    puppet_modules: puppet/mosules
+    timeout: 3600
