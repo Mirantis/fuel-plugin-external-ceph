@@ -1,6 +1,6 @@
 $plugin_name = 'external-ceph'
 
-notice("MODULAR: ${plugin_name}/volumes.pp")
+notice("MODULAR: ${plugin_name}/volumes-controller.pp")
 
 
 $external_ceph = hiera_hash('external-ceph', {})

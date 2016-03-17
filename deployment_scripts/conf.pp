@@ -1,13 +1,16 @@
 $plugin_name = 'external-ceph'
 
-notice("MODULAR: ${plugin-name}/conf.pp")
+notice("MODULAR: ${plugin_name}/conf.pp")
 
 
-$mon_host_string = hiera('ceph_mons', "")
-$fsid            = hiera('ceph_fsid', "")
+$external_ceph = hiera_hash('external-ceph', {})
 
-$cinder_ceph     = hiera('cinder_ceph', False)
-$cinder_key      = hiera('cinder_key', False)
+$mon_host_string = pick($external_ceph['ceph_mons'], "")
+$fsid            = pick($external_ceph['ceph_fsid'], "")
+
+$cinder_ceph     = pick($external_ceph['cinder_ceph'], false)
+$cinder_key      = pick($external_ceph['cinder_key'], false)
+$cinder_user      = pick($external_ceph['cinder_user'], false)
 
 
 file { '/etc/ceph':
@@ -16,7 +19,7 @@ file { '/etc/ceph':
 
 file { 'ceph_conf':
   content => template('external_ceph/ceph.conf'),
-  path    => '/etc/ceph/ceph.conf'
+  path    => '/etc/ceph/ceph.conf',
   ensure  => present,
   mode    => 0644,
 }

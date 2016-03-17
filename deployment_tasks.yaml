@@ -1,28 +1,54 @@
 # These tasks will be merged into deployment graph. Here you
 # can specify new tasks for any roles, even built-in ones.
 
-- id: ceph-conf
+- id: ceph-conf-controller
   type: puppet
-  groups: [controller, compute]
+  groups: [primary-controller, controller]
   required_for: [deploy_end]
-  requires: []
+  requires: [openstack-cinder, glance]
   version: 2.0.0
 #  cross-depends:
 #    - name: primary-ceph-mon
   parameters:
     puppet_manifest: conf.pp
-    puppet_modules: puppet/mosules
+    puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
 
-- id: ceph-volumes
+- id: ceph-conf-compute
   type: puppet
-  groups: [controller]
-  required_for: [deploy_end, controller_remaining_tasks]
-  requires: [openstack-controller, ceph-conf]
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [top-role-compute]
   version: 2.0.0
 #  cross-depends:
 #    - name: primary-ceph-mon
   parameters:
-    puppet_manifest: volumes.pp
-    puppet_modules: puppet/mosules
+    puppet_manifest: conf.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600
+
+- id: ceph-volumes-controller
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [ceph-conf-controller]
+  version: 2.0.0
+#  cross-depends:
+#    - name: primary-ceph-mon
+  parameters:
+    puppet_manifest: volumes-controller.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600
+
+- id: ceph-volumes-and-ephemeral-compute
+  type: puppet
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [top-role-compute, ceph-conf-compute]
+  version: 2.0.0
+#  cross-depends:
+#    - name: primary-ceph-mon
+  parameters:
+    puppet_manifest: volumes-and-ephemeral-compute.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
