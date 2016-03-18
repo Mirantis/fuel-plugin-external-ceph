@@ -13,14 +13,19 @@ $nova_key     = pick($external_ceph['nova_key'], false)
 $nova_pool    = pick($external_ceph['nova_pool'], false)
 
 
-include cinder::params
+include nova::params
 
 
 if $cinder_ceph {
 
   service { "$nova::params::compute_service_name":
-    enable   => true,
-    ensure   => running,
+    enable => true,
+    ensure => running,
+  }
+
+  package { 'ceph-client-package':
+    ensure => installed,
+    name   => 'ceph',
   }
 
   class { 'nova::compute::rbd':
@@ -31,6 +36,10 @@ if $cinder_ceph {
     ephemeral_storage       => $nova_ceph,
   }
 
-  Nova_config<||> ~> Service["${nova::params::compute_service_name}"]
+  File <| title == '/etc/nova/secret.xml' |> {
+    require => [],
+  }
+
+  Package['ceph-client-package'] -> Nova_config<||> ~> Service["${nova::params::compute_service_name}"]
 }
 

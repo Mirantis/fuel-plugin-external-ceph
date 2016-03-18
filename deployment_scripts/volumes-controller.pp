@@ -32,6 +32,12 @@ if $cinder_ceph {
     before   => Class['cinder::volume'],
   }
 
+  package { 'ceph-client-package':
+    ensure => installed,
+    name   => 'ceph',
+  }
+
+
   service { "$::cinder::params::tgt_service_name":
     enable   => false,
     ensure   => stopped,
@@ -57,6 +63,7 @@ if $cinder_ceph {
   }
 
 
+  Package['ceph-client-package'] -> Cinder_config<||>
   Cinder_config<||> ~> Service["${cinder::params::api_service}"]
   Cinder_config<||> ~> Service["${cinder::params::volume_service}"]
 
