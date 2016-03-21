@@ -2,3 +2,11 @@
 [client.<%= @cinder_user %>]
         key = <%= @cinder_key %>
 <% end %>
+<% if @glance_ceph %>
+[client.<%= @glance_user %>]
+        key = <%= @glance_key %>
+<% end %>
+<% if @nova_ceph %>
+[client.<%= @nova_user %>]
+        key = <%= @nova_key %>
+<% end %>

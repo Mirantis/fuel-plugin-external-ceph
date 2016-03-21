@@ -52,3 +52,16 @@
     puppet_manifest: volumes-and-ephemeral-compute.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
+
+- id: ceph-images-controller
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [ceph-conf-controller]
+  version: 2.0.0
+#  cross-depends:
+#    - name: primary-ceph-mon
+  parameters:
+    puppet_manifest: images.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600

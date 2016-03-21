@@ -10,8 +10,15 @@ $fsid            = pick($external_ceph['ceph_fsid'], "")
 
 $cinder_ceph     = pick($external_ceph['cinder_ceph'], false)
 $cinder_key      = pick($external_ceph['cinder_key'], false)
-$cinder_user      = pick($external_ceph['cinder_user'], false)
+$cinder_user     = pick($external_ceph['cinder_user'], false)
 
+$glance_ceph     = pick($external_ceph['glance_ceph'], true)
+$glance_user     = pick($external_ceph['glance_user'], false)
+$glance_key      = pick($external_ceph['glance_key'], false)
+
+$nova_ceph     = pick($external_ceph['nova_ceph'], true)
+$nova_user     = pick($external_ceph['nova_user'], false)
+$nova_key      = pick($external_ceph['nova_key'], false)
 
 file { '/etc/ceph':
   ensure => directory,

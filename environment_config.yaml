@@ -15,6 +15,12 @@ attributes:
     weight: 2
     type: 'text'
 
+  glance_ceph:
+    value: True
+    label: 'Use Ceph as a backend for Glance (Images)'
+    description: ''
+    weight: 5
+    type: 'checkbox'
   glance_user:
     value: 'glance'
     label: 'Ceph User for Glance'
