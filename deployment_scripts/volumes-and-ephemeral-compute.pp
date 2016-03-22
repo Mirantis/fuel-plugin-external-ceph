@@ -16,30 +16,27 @@ $nova_pool    = pick($external_ceph['nova_pool'], false)
 include nova::params
 
 
-if $cinder_ceph {
-
-  service { "$nova::params::compute_service_name":
-    enable => true,
-    ensure => running,
-  }
-
-  package { 'ceph-client-package':
-    ensure => installed,
-    name   => 'ceph',
-  }
-
-  class { 'nova::compute::rbd':
-    libvirt_rbd_user        => $nova_user,
-    libvirt_images_rbd_pool => $nova_pool, # actually, it's for volumes, option naming skills: openstack/10
-    libvirt_rbd_secret_uuid => 'a5d0dd94-57c4-ae55-ffe0-7e3732a24455', # seems to be hardcoded in the library
-    libvirt_rbd_secret_key  => $nova_key,
-    ephemeral_storage       => $nova_ceph,
-  }
-
-  File <| title == '/etc/nova/secret.xml' |> {
-    require => [],
-  }
-
-  Package['ceph-client-package'] -> Nova_config<||> ~> Service["${nova::params::compute_service_name}"]
+service { "$nova::params::compute_service_name":
+  enable => true,
+  ensure => running,
 }
+
+package { 'ceph-client-package':
+  ensure => installed,
+  name   => 'ceph',
+}
+
+class { 'nova::compute::rbd':
+  libvirt_rbd_user        => $nova_user,
+  libvirt_images_rbd_pool => $nova_pool, # actually, it's for volumes, option naming skills: openstack/10
+  libvirt_rbd_secret_uuid => 'a5d0dd94-57c4-ae55-ffe0-7e3732a24455', # seems to be hardcoded in the library
+  libvirt_rbd_secret_key  => $nova_key,
+  ephemeral_storage       => $nova_ceph,
+}
+
+File <| title == '/etc/nova/secret.xml' |> {
+  require => [],
+}
+
+Package['ceph-client-package'] -> Nova_config<||> ~> Service["${nova::params::compute_service_name}"]
 

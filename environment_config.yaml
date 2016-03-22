@@ -1,90 +1,162 @@
 attributes:
   metadata:
     group: 'storage'
-
   ceph_fsid:
     value: 'aa6e4daa-9be1-4165-bf02-7d79e7779bf6'
     label: 'Ceph Cluster FSID'
-    description: 'TODO'
+    description: ''
     weight: 1
     type: 'text'
   ceph_mons:
     value: '192.168.0.3 192.168.0.5 192.168.0.4'
     label: 'Ceph Mons IP Addresses'
-    description: 'TODO'
+    description: ''
     weight: 2
     type: 'text'
-
+  deploy_swift:
+    value: True
+    label: 'Deploy Swift (Object Storage)'
+    description: ''
+    weight: 3
+    type: 'checkbox'
+      - condition: "settings:external-ceph.deploy_radosgw.value == true"
+        message: "RadosGW deployment is enabled"
+  deploy_radosgw:
+    value: False
+    label: 'Deploy RadosGW (Object Storage -- S3 API for Ceph)'
+    description: ''
+    weight: 4
+    type: 'checkbox'
+    restrictions:
+      - condition: "settings:external-ceph.deploy_swift.value == true"
+        message: "Swift deployment is enabled"
+  s3_endpoint:
+    value: ''
+    label: 'External S3 API Endpoint'
+    description: ''
+    weight: 5
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.deploy_swift.value == true"
+        message: "Swift deployment is enabled; it's endpoint will be used instead"
+      - condition: "settings:external-ceph.deploy_radosgw.value == true"
+        message: "RadosGW deployment is enabled; it's endpoint will be used instead"
   glance_ceph:
     value: True
     label: 'Use Ceph as a backend for Glance (Images)'
     description: ''
-    weight: 5
+    weight: 9
     type: 'checkbox'
-  glance_user:
-    value: 'glance'
-    label: 'Ceph User for Glance'
-    description: 'Username that Glance is going to use to access Ceph'
-    weight: 10
-    type: 'text'
-  glance_key:
-    value: ''
-    label: 'Ceph Key for Glance User'
-    description: 'Key that Glance is going to use to access Ceph'
-    weight: 15
-    type: 'password'
-  glance_pool:
-    value: 'images'
-    label: 'Ceph Pool Name for Glance'
-    description: 'Ceph pool, Glance will be storing images in'
-    weight: 20
-    type: 'text'
-
   cinder_ceph:
     value: True
     label: 'Use Ceph as a backend for Cinder (Volumes)'
-    weight: 25
+    weight: 10
     type: 'checkbox'
-  cinder_user:
-    value: 'cinder'
-    label: 'Ceph User for Cinder'
-    description: 'Username that Cinder is going to use to access Ceph'
-    weight: 30
-    type: 'text'
-  cinder_key:
-    value: ''
-    label: 'Ceph Key for Cinder'
-    description: 'Key that Cinder is going to use to access Ceph'
-    weight: 35
-    type: 'password'
-  cinder_pool:
-    value: 'volumes'
-    label: 'Ceph Pool Name for Cinder'
-    description: 'Ceph pool, Cinder will be storing Volumes in'
-    weight: 40
-    type: 'text'
-
   nova_ceph:
     value: True
     label: 'Use Ceph as a backend for Nova Ephemeral Drives'
     description: ''
-    weight: 45
+    weight: 15
     type: 'checkbox'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == true"
+        message: "Ceph Backend for Cinder must be enabled in order to use Ceph for Ephemeral Drives"
+  glance_user:
+    value: 'glance'
+    label: 'Ceph User for Glance'
+    description: 'Username that Glance is going to use to access Ceph'
+    weight: 20
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.glance_ceph.value == true"
+        message: "External Ceph for Glance images is not enabled"
+  glance_key:
+    value: ''
+    label: 'Ceph Key for Glance User'
+    description: 'Key that Glance is going to use to access Ceph'
+    weight: 25
+    type: 'password'
+    restrictions:
+      - condition: "settings:external-ceph.glance_ceph.value == true"
+        message: "External Ceph for Glance images is not enabled"
+  glance_pool:
+    value: 'images'
+    label: 'Ceph Pool Name for Glance'
+    description: 'Ceph pool, Glance will be storing images in'
+    weight: 30
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.glance_ceph.value == true"
+        message: "External Ceph for Glance images is not enabled"
+  cinder_user:
+    value: 'cinder'
+    label: 'Ceph User for Cinder'
+    description: 'Username that Cinder is going to use to access Ceph'
+    weight: 35
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == true"
+        message: "External Ceph for Cinder volumes is not enabled"
+  cinder_key:
+    value: ''
+    label: 'Ceph Key for Cinder'
+    description: 'Key that Cinder is going to use to access Ceph'
+    weight: 40
+    type: 'password'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == true"
+        message: "External Ceph for Cinder volumes is not enabled"
+  cinder_pool:
+    value: 'volumes'
+    label: 'Ceph Pool Name for Cinder'
+    description: 'Ceph pool, Cinder will be storing Volumes in'
+    weight: 45
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == true"
+        message: "External Ceph for Cinder volumes is not enabled"
   nova_user:
     value: 'nova'
     label: 'Ceph User for Nova'
     description: 'Username that Nova is going to use to access Ceph'
     weight: 50
     type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.nova_ceph.value == true"
+        message: "External Ceph for Nova ephemeral drives is not enabled"
   nova_key:
     value: ''
     label: 'Ceph Key for Nova'
     description: 'Key that Nova is going to use to access Ceph'
     weight: 55
     type: 'password'
+    restrictions:
+      - condition: "settings:external-ceph.nova_ceph.value == true"
+        message: "External Ceph for Nova ephemeral drives is not enabled"
   nova_pool:
     value: 'compute'
     label: 'Ceph Pool Name for Nova'
     description: 'Ceph pool, Nova will be storing Ephemeral Drives in'
     weight: 60
     type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.nova_ceph.value == true"
+        message: "External Ceph for Nova ephemeral drives is not enabled"
+  radosgw_user:
+    value: 'radosgw.gateway'
+    label: 'Ceph User for RadosGW'
+    description: 'Username that RadosGW is going to use to access Ceph'
+    weight: 65
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.radosgw_ceph.value == true"
+        message: "Deployment of RadosGW is not enabled"
+  radosgw_key:
+    value: ''
+    label: 'Ceph Key for RadosGW'
+    description: 'Key that RadosGW is going to use to access Ceph'
+    weight: 70
+    type: 'password'
+    restrictions:
+      - condition: "settings:external-ceph.radosgw_ceph.value == true"
+        message: "Deployment of RadosGW is not enabled"
