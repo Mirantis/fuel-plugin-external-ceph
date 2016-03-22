@@ -19,6 +19,7 @@ attributes:
     description: ''
     weight: 3
     type: 'checkbox'
+    restrictions:
       - condition: "settings:external-ceph.deploy_radosgw.value == true"
         message: "RadosGW deployment is enabled"
   deploy_radosgw:
@@ -59,7 +60,7 @@ attributes:
     weight: 15
     type: 'checkbox'
     restrictions:
-      - condition: "settings:external-ceph.cinder_ceph.value == true"
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "Ceph Backend for Cinder must be enabled in order to use Ceph for Ephemeral Drives"
   glance_user:
     value: 'glance'
@@ -68,7 +69,7 @@ attributes:
     weight: 20
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.glance_ceph.value == true"
+      - condition: "settings:external-ceph.glance_ceph.value == false"
         message: "External Ceph for Glance images is not enabled"
   glance_key:
     value: ''
@@ -77,7 +78,7 @@ attributes:
     weight: 25
     type: 'password'
     restrictions:
-      - condition: "settings:external-ceph.glance_ceph.value == true"
+      - condition: "settings:external-ceph.glance_ceph.value == false"
         message: "External Ceph for Glance images is not enabled"
   glance_pool:
     value: 'images'
@@ -86,7 +87,7 @@ attributes:
     weight: 30
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.glance_ceph.value == true"
+      - condition: "settings:external-ceph.glance_ceph.value == false"
         message: "External Ceph for Glance images is not enabled"
   cinder_user:
     value: 'cinder'
@@ -95,7 +96,7 @@ attributes:
     weight: 35
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.cinder_ceph.value == true"
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "External Ceph for Cinder volumes is not enabled"
   cinder_key:
     value: ''
@@ -104,7 +105,7 @@ attributes:
     weight: 40
     type: 'password'
     restrictions:
-      - condition: "settings:external-ceph.cinder_ceph.value == true"
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "External Ceph for Cinder volumes is not enabled"
   cinder_pool:
     value: 'volumes'
@@ -113,7 +114,7 @@ attributes:
     weight: 45
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.cinder_ceph.value == true"
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "External Ceph for Cinder volumes is not enabled"
   nova_user:
     value: 'nova'
@@ -122,7 +123,7 @@ attributes:
     weight: 50
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.nova_ceph.value == true"
+      - condition: "settings:external-ceph.nova_ceph.value == false"
         message: "External Ceph for Nova ephemeral drives is not enabled"
   nova_key:
     value: ''
@@ -131,7 +132,7 @@ attributes:
     weight: 55
     type: 'password'
     restrictions:
-      - condition: "settings:external-ceph.nova_ceph.value == true"
+      - condition: "settings:external-ceph.nova_ceph.value == false"
         message: "External Ceph for Nova ephemeral drives is not enabled"
   nova_pool:
     value: 'compute'
@@ -140,7 +141,7 @@ attributes:
     weight: 60
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.nova_ceph.value == true"
+      - condition: "settings:external-ceph.nova_ceph.value == false"
         message: "External Ceph for Nova ephemeral drives is not enabled"
   radosgw_user:
     value: 'radosgw.gateway'
@@ -149,7 +150,7 @@ attributes:
     weight: 65
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.radosgw_ceph.value == true"
+      - condition: "settings:external-ceph.deploy_radosgw.value == false"
         message: "Deployment of RadosGW is not enabled"
   radosgw_key:
     value: ''
@@ -158,5 +159,5 @@ attributes:
     weight: 70
     type: 'password'
     restrictions:
-      - condition: "settings:external-ceph.radosgw_ceph.value == true"
+      - condition: "settings:external-ceph.deploy_radosgw.value == false"
         message: "Deployment of RadosGW is not enabled"

@@ -4,7 +4,7 @@
   type: puppet
   groups: [primary-controller, controller]
   required_for: [deploy_end]
-  requires: [openstack-cinder, glance]
+  requires: [openstack-cinder, glance, keystone]
   version: 2.0.0
   parameters:
     puppet_manifest: conf.pp
@@ -55,6 +55,30 @@
   condition: "settings:external-ceph.glance_ceph.value == true"
   parameters:
     puppet_manifest: images.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600
+
+- id: ceph-radosgw-controller
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [ceph-conf-controller]
+  version: 2.0.0
+  condition: "settings:external-ceph.deploy_radosgw.value == true"
+  parameters:
+    puppet_manifest: radosgw.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600
+
+- id: ceph-radosgw-controller
+  type: puppet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [ceph-conf-controller, ceph-radosgw-controller]
+  version: 2.0.0
+  condition: "settings:external-ceph.deploy_swift.value == false"
+  parameters:
+    puppet_manifest: radosgw-keystone.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
 
