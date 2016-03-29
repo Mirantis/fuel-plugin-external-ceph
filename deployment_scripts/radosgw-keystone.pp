@@ -5,27 +5,10 @@ notice("MODULAR: ${plugin_name}/radosgw-keystone.pp")
 
 $region         = 'RegionOne'
 $external_ceph  = hiera_hash('external-ceph', {})
-$deploy_radosgw = pick($external_ceph['deploy_radosgw'], false)
 
-if $deploy_radosgw {
-  $public_ssl_hash     = hiera('public_ssl')
-  $pub_protocol        = $public_ssl_hash['services'] ? {
-    true    => 'https',
-    default => 'http'
-  }
-  $public_ip           = hiera('public_vip')
-  $int_ip              = hiera('management_vip')
-  $adm_ip              = hiera('management_vip')
-  $swift_endpoint_port = 8080
-
-  $public_url          = "${pub_protocol}://${pub_ip}:${swift_endpoint_port}/swift/v1",
-  $admin_url           = "http://${adm_ip}:${swift_endpoint_port}/swift/v1",
-  $internal_url        = "http://${int_ip}:${swift_endpoint_port}/swift/v1",
-} else {
-  $public_url          = external_ceph['s3_endpoint']
-  $internal_url        = external_ceph['s3_endpoint']
-  $admin_url           = external_ceph['s3_endpoint']
-}
+$public_url          = external_ceph['radosgw_endpoint_public']
+$internal_url        = external_ceph['radosgw_endpoint_internal']
+$admin_url           = external_ceph['radosgw_endpoint_admin']
 
 keystone_service {'swift':
   ensure      => present,

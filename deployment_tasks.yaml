@@ -6,6 +6,7 @@
   required_for: [deploy_end]
   requires: [openstack-cinder, glance, keystone]
   version: 2.0.0
+  condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
   parameters:
     puppet_manifest: conf.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
@@ -17,6 +18,7 @@
   required_for: [deploy_end]
   requires: [top-role-compute]
   version: 2.0.0
+  condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
   parameters:
     puppet_manifest: conf.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
@@ -58,25 +60,13 @@
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
 
-- id: ceph-radosgw-controller
+- id: ceph-radosgw-keystone-controller
   type: puppet
   groups: [primary-controller, controller]
   required_for: [deploy_end, controller_remaining_tasks]
   requires: [ceph-conf-controller]
   version: 2.0.0
-  condition: "settings:external-ceph.deploy_radosgw.value == true"
-  parameters:
-    puppet_manifest: radosgw.pp
-    puppet_modules: /etc/puppet/modules:puppet/modules
-    timeout: 3600
-
-- id: ceph-radosgw-controller
-  type: puppet
-  groups: [primary-controller, controller]
-  required_for: [deploy_end, controller_remaining_tasks]
-  requires: [ceph-conf-controller, ceph-radosgw-controller]
-  version: 2.0.0
-  condition: "settings:external-ceph.deploy_swift.value == false"
+  condition: "settings:external-ceph.external_radosgw.value == true"
   parameters:
     puppet_manifest: radosgw-keystone.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
@@ -92,7 +82,7 @@
   requires: [openstack-controller]
   cross-depends:
     - name: primary-swift
-  condition: "settings:external-ceph.deploy_swift.value == true"
+  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/swift.pp
     puppet_modules: /etc/puppet/modules
@@ -112,7 +102,7 @@
     - name: /(primary-)?rabbitmq/
     - name: swift-keystone
     - name: memcached
-  condition: "settings:external-ceph.deploy_swift.value == true"
+  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/swift.pp
     puppet_modules: /etc/puppet/modules
@@ -131,7 +121,7 @@
   cross-depends:
     - name: /(primary-)?swift/
       role: self
-  condition: "settings:external-ceph.deploy_swift.value == true"
+  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/rebalance_cronjob.pp
     puppet_modules: /etc/puppet/modules
@@ -149,9 +139,21 @@
   cross-depends:
     - name: keystone
   requires: [primary-keystone, keystone]
-  condition: "settings:external-ceph.deploy_swift.value == true"
+  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
     puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/keystone.pp
     puppet_modules: /etc/puppet/modules
     timeout: 1800
+
+- id: create-cinder-types
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller]
+  requires: [openstack-cinder]
+  required_for: [deploy_end]
+  condition: "settings:external-ceph.cinder_ceph.value == false"
+  parameters:
+    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/openstack-cinder/create_cinder_types.pp
+    puppet_modules: /etc/puppet/modules
+    timeout: 1200
 

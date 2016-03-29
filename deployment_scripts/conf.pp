@@ -20,10 +20,6 @@ $nova_ceph       = pick($external_ceph['nova_ceph'], true)
 $nova_user       = pick($external_ceph['nova_user'], false)
 $nova_key        = pick($external_ceph['nova_key'], false)
 
-$deploy_radosgw  = pick($external_ceph['deploy_radosgw'], true)
-$radosgw_user    = pick($external_ceph['radosgw_user'], false)
-$radosgw_key     = pick($external_ceph['radosgw_key'], false)
-
 file { '/etc/ceph':
   ensure => directory,
 }

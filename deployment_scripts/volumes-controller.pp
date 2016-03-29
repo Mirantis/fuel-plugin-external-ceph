@@ -37,8 +37,8 @@ package { 'ceph-client-package':
 
 
 service { "$::cinder::params::tgt_service_name":
-  enable   => false,
-  ensure   => stopped,
+  enable   => true,
+  ensure   => running,
 }
 
 class { 'cinder::volume':

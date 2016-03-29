@@ -4,37 +4,78 @@
 # - https://blueprints.launchpad.net/fuel/+spec/component-registry
 # - https://specs.openstack.org/openstack/fuel-specs/specs/8.0/component-registry.html
 
-- name: storage:block:external-ceph
-  compatible: []
-  requires: []
+- name: additional_service:external-ceph
   incompatible:
-  - name: storage:block:lvm
   - name: storage:block:ceph
-  label: "External Ceph"
-  description: "Use external Ceph cluster as a backend for Volumes"
-
-- name: storage:object:external-ceph
-  compatible: []
-  requires: []
-  incompatible:
-  - name: storage:object:swift
   - name: storage:object:ceph
-  label: "External Ceph"
-  description: "Use external Ceph cluster as a backend for Objects"
-
-- name: storage:image:external-ceph
-  compatible: []
-  requires: []
-  incompatible:
-  - name: storage:image:swift
   - name: storage:image:ceph
-  label: "External Ceph"
-  description: "Use external Ceph cluster as a backend for Images"
-
-- name: storage:ephemeral:external-ceph
-  compatible: []
-  requires: []
-  incompatible:
   - name: storage:ephemeral:ceph
   label: "External Ceph"
-  description: "Use external Ceph cluster as a backend for Ephemeral Storage"
+  description: "Use external Ceph cluster as a backend for Volumes, Images, Objects and Ephemeral Drives"
+
+#- name: storage:block:external-ceph
+#  incompatible:
+#  - name: storage:block:lvm
+#  - name: storage:block:ceph
+#  label: "External Ceph"
+#  description: "Use external Ceph cluster as a backend for Volumes"
+#
+#- name: storage:object:external-ceph
+#  requires:
+#  - name: storage:block:external-ceph
+#  incompatible:
+## Until Nailun supports binding components to settings values from plugins, we'll restrict this plugin's components to storage:block:external-ceph
+#  - name: storage:object:ceph
+#  - name: storage:object:swift
+#  - name: storage:block:lvm
+#  - name: storage:block:ceph
+#  label: "External Ceph (RadosGW)"
+#  description: "Use external Ceph cluster as a backend for Objects"
+#
+#- name: storage:image:external-ceph
+#  requires:
+#  - name: storage:block:external-ceph
+#  incompatible:
+#  - name: storage:image:ceph
+#  - name: storage:image:swift
+#  - name: storage:block:lvm
+#  - name: storage:block:ceph
+#  label: "External Ceph"
+#  description: "Use external Ceph cluster as a backend for Images"
+#
+#- name: storage:ephemeral:external-ceph
+#  requires:
+#  - name: storage:block:external-ceph
+#  incompatible:
+#  - name: storage:ephemeral:ceph
+#  - name: storage:ephemeral:local-file
+#  - name: storage:block:lvm
+#  - name: storage:block:ceph
+#  label: "External Ceph"
+#  description: "Use external Ceph cluster as a backend for Ephemeral Storage"
+#
+#
+## HAX to get Fuel to work correctly w/ alternate (default) backends
+#
+#- name: storage:object:swift
+#  incompatible:
+#  - name: storage:object:ceph
+#  - name: storage:object:externalceph
+#  label: "Swift"
+#  description: "Swift is not recommended for Object Storage, select only if you are going to use it as a backend for Glance"
+#
+#- name: storage:image:swift
+#  incompatible:
+#  - name: storage:image:ceph
+#  - name: storage:image:external-ceph
+#  requires:
+#  - name: storage:object:swift
+#  label: "Swift"
+#  description: "Use Swift as Glance backend"
+#
+#- name: storage:ephemeral:local-file
+#  incompatible:
+#  - name: storage:ephemeral:ceph
+#  - name: storage:ephemeral:external-ceph
+#  label: "Local file"
+#  description: "Store Ephemeral drives as files on compute nodes"

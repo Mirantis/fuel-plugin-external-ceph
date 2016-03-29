@@ -13,35 +13,39 @@ attributes:
     description: ''
     weight: 2
     type: 'text'
-  deploy_swift:
+  external_radosgw:
     value: True
-    label: 'Deploy Swift (Object Storage)'
+    label: 'Use RadosGW for Object Storage'
     description: ''
     weight: 3
     type: 'checkbox'
-    restrictions:
-      - condition: "settings:external-ceph.deploy_radosgw.value == true"
-        message: "RadosGW deployment is enabled"
-  deploy_radosgw:
-    value: False
-    label: 'Deploy RadosGW (Object Storage -- S3 API for Ceph)'
-    description: ''
-    weight: 4
-    type: 'checkbox'
-    restrictions:
-      - condition: "settings:external-ceph.deploy_swift.value == true"
-        message: "Swift deployment is enabled"
-  s3_endpoint:
+  radosgw_endpoint_public:
     value: ''
-    label: 'External S3 API Endpoint'
+    label: 'External RadosGW Public Endpoint'
     description: ''
     weight: 5
     type: 'text'
     restrictions:
-      - condition: "settings:external-ceph.deploy_swift.value == true"
-        message: "Swift deployment is enabled; it's endpoint will be used instead"
-      - condition: "settings:external-ceph.deploy_radosgw.value == true"
-        message: "RadosGW deployment is enabled; it's endpoint will be used instead"
+      - condition: "settings:external-ceph.external_radosgw.value == false"
+        message: "External RadosGW is disabled"
+  radosgw_endpoint_internal:
+    value: ''
+    label: 'External RadosGW Internal Endpoint'
+    description: ''
+    weight: 6
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.external_radosgw.value == false"
+        message: "External RadosGW is disabled"
+  radosgw_endpoint_admin:
+    value: ''
+    label: 'External RadosGW Admin Endpoint'
+    description: ''
+    weight: 7
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.external_radosgw.value == false"
+        message: "External RadosGW is disabled"
   glance_ceph:
     value: True
     label: 'Use Ceph as a backend for Glance (Images)'
@@ -143,21 +147,3 @@ attributes:
     restrictions:
       - condition: "settings:external-ceph.nova_ceph.value == false"
         message: "External Ceph for Nova ephemeral drives is not enabled"
-  radosgw_user:
-    value: 'radosgw.gateway'
-    label: 'Ceph User for RadosGW'
-    description: 'Username that RadosGW is going to use to access Ceph'
-    weight: 65
-    type: 'text'
-    restrictions:
-      - condition: "settings:external-ceph.deploy_radosgw.value == false"
-        message: "Deployment of RadosGW is not enabled"
-  radosgw_key:
-    value: ''
-    label: 'Ceph Key for RadosGW'
-    description: 'Key that RadosGW is going to use to access Ceph'
-    weight: 70
-    type: 'password'
-    restrictions:
-      - condition: "settings:external-ceph.deploy_radosgw.value == false"
-        message: "Deployment of RadosGW is not enabled"

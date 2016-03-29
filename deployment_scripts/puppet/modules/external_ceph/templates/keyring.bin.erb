@@ -10,7 +10,3 @@
 [client.<%= @nova_user %>]
         key = <%= @nova_key %>
 <% end %>
-<% if @deploy_radosgw %>
-[client.<%= @radosgw_user %>]
-        key = <%= @radosgw_key %>
-<% end %>
