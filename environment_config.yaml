@@ -4,19 +4,19 @@ attributes:
   ceph_fsid:
     value: 'aa6e4daa-9be1-4165-bf02-7d79e7779bf6'
     label: 'Ceph Cluster FSID'
-    description: ''
+    description: 'Should be set to the value of "fsid" setting in /etc/ceph/ceph.conf on the mon node of Ceph cluster'
     weight: 1
     type: 'text'
   ceph_mons:
     value: '192.168.0.3 192.168.0.5 192.168.0.4'
     label: 'Ceph Mons IP Addresses'
-    description: ''
+    description: 'Should be set to the value of "mon_host" setting in /etc/ceph/ceph.conf on the mon node of Ceph cluster'
     weight: 2
     type: 'text'
   external_radosgw:
     value: True
     label: 'Use RadosGW for Object Storage'
-    description: ''
+    description: "If checked, OpenStack will use external RadosGW for object storage. Please note that external RadosGW must be configured to use this cluster's Keystone for authentication. See README for details"
     weight: 3
     type: 'checkbox'
   radosgw_endpoint_public:

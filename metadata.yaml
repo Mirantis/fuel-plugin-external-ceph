@@ -1,23 +1,23 @@
 # Plugin name
 name: external-ceph
 # Human-readable name for your plugin
-title: Title for external-ceph plugin
+title: External Ceph as Storage Backend
 # Plugin version
-version: '1.0.1'
+version: '1.0.2'
 # Description
-description: Please describe your plugin here
+description: Allowes to configure OpenStack to use external Ceph cluster for Volume, Image, Object and Ephemeral Drives storage.
 # Required fuel version
 fuel_version: ['8.0']
 # Specify license of your plugin
 licenses: ['Apache License Version 2.0']
 # Specify author or company name
-authors: ['Specify author or company name']
+authors: ['Dmitry Nikishov <dnikishov@mirantis.com>']
 # A link to the plugin's page
-homepage: 'https://github.com/openstack/fuel-plugins'
+homepage: 'https://github.com/mirantis/fuel-plugin-external-ceph'
 # Specify a group which your plugin implements, possible options:
 # network, storage, storage::cinder, storage::glance, hypervisor,
 # equipment
-groups: []
+groups: ['storage']
 # Change `false` to `true` if the plugin can be installed in the environment
 # after the deployment.
 is_hotpluggable: false
