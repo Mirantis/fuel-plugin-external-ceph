@@ -120,6 +120,33 @@ attributes:
     restrictions:
       - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "External Ceph for Cinder volumes is not enabled"
+  cinder_backup_user:
+    value: 'cinder'
+    label: 'Ceph User for Cinder Backups'
+    description: 'Username that Cinder is going to use to access Ceph to store volume backups'
+    weight: 46
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
+        message: "External Ceph for Cinder volumes is not enabled"
+  cinder_backup_key:
+    value: ''
+    label: 'Ceph Key for Cinder Backups'
+    description: 'Key that Cinder is going to use to access Ceph to store volume backups'
+    weight: 47
+    type: 'password'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
+        message: "External Ceph for Cinder volumes is not enabled"
+  cinder_backup_pool:
+    value: 'volumes'
+    label: 'Ceph Pool Name for Cinder Backups'
+    description: 'Ceph pool, Cinder will be storing volume backups in'
+    weight: 48
+    type: 'text'
+    restrictions:
+      - condition: "settings:external-ceph.cinder_ceph.value == false"
+        message: "External Ceph for Cinder volumes is not enabled"
   nova_user:
     value: 'nova'
     label: 'Ceph User for Nova'

@@ -36,6 +36,18 @@
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
 
+- id: ceph-volume-types-primary-controller
+  type: puppet
+  groups: [primary-controller]
+  required_for: [deploy_end, controller_remaining_tasks]
+  requires: [ceph-conf-controller, ceph-volumes-controller]
+  version: 2.0.0
+  condition: "settings:external-ceph.cinder_ceph.value == true"
+  parameters:
+    puppet_manifest: volumes-types.pp
+    puppet_modules: /etc/puppet/modules:puppet/modules
+    timeout: 3600
+
 - id: ceph-volumes-and-ephemeral-compute
   type: puppet
   groups: [compute]

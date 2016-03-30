@@ -3,22 +3,25 @@ $plugin_name = 'external-ceph'
 notice("MODULAR: ${plugin_name}/conf.pp")
 
 
-$external_ceph = hiera_hash('external-ceph', {})
+$external_ceph      = hiera_hash('external-ceph', {})
 
-$mon_host_string = pick($external_ceph['ceph_mons'], "")
-$fsid            = pick($external_ceph['ceph_fsid'], "")
+$mon_host_string    = pick($external_ceph['ceph_mons'], "")
+$fsid               = pick($external_ceph['ceph_fsid'], "")
 
-$cinder_ceph     = pick($external_ceph['cinder_ceph'], false)
-$cinder_key      = pick($external_ceph['cinder_key'], false)
-$cinder_user     = pick($external_ceph['cinder_user'], false)
+$cinder_ceph        = pick($external_ceph['cinder_ceph'], false)
+$cinder_key         = pick($external_ceph['cinder_key'], false)
+$cinder_user        = pick($external_ceph['cinder_user'], false)
 
-$glance_ceph     = pick($external_ceph['glance_ceph'], true)
-$glance_user     = pick($external_ceph['glance_user'], false)
-$glance_key      = pick($external_ceph['glance_key'], false)
+$glance_ceph        = pick($external_ceph['glance_ceph'], true)
+$glance_user        = pick($external_ceph['glance_user'], false)
+$glance_key         = pick($external_ceph['glance_key'], false)
 
-$nova_ceph       = pick($external_ceph['nova_ceph'], true)
-$nova_user       = pick($external_ceph['nova_user'], false)
-$nova_key        = pick($external_ceph['nova_key'], false)
+$nova_ceph          = pick($external_ceph['nova_ceph'], true)
+$nova_user          = pick($external_ceph['nova_user'], false)
+$nova_key           = pick($external_ceph['nova_key'], false)
+
+$cinder_backup_key  = pick($external_ceph['cinder_backup_key'], false)
+$cinder_backup_user = pick($external_ceph['cinder_backup_user'], false)
 
 file { '/etc/ceph':
   ensure => directory,

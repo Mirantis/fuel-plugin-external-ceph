@@ -1,6 +1,8 @@
 <% if @cinder_ceph %>
 [client.<%= @cinder_user %>]
         key = <%= @cinder_key %>
+[client.<%= @cinder_backup_user %>]
+        key = <%= @cinder_backup_key %>
 <% end %>
 <% if @glance_ceph %>
 [client.<%= @glance_user %>]
