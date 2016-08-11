@@ -1,35 +1,35 @@
 # Plugin tasks
 
-- id: ceph-conf-controller
+- id: ceph-conf
   type: puppet
-  groups: [primary-controller, controller]
+  groups: [primary-controller, controller, compute]
   required_for: [deploy_end]
-  requires: [openstack-cinder, glance, keystone]
-  version: 2.0.0
+  requires: [openstack-cinder, glance, keystone, top-role-compute]
+  version: 2.1.0
   condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
   parameters:
     puppet_manifest: conf.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
-
-- id: ceph-conf-compute
-  type: puppet
-  groups: [compute]
-  required_for: [deploy_end]
-  requires: [top-role-compute]
-  version: 2.0.0
-  condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
-  parameters:
-    puppet_manifest: conf.pp
-    puppet_modules: /etc/puppet/modules:puppet/modules
-    timeout: 3600
+#
+#- id: ceph-conf-compute
+#  type: puppet
+#  groups: [compute]
+#  required_for: [deploy_end]
+#  requires: [top-role-compute]
+#  version: 2.1.0
+#  condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
+#  parameters:
+#    puppet_manifest: conf.pp
+#    puppet_modules: /etc/puppet/modules:puppet/modules
+#    timeout: 3600
 
 - id: ceph-volumes-controller
   type: puppet
   groups: [primary-controller, controller]
   required_for: [deploy_end, controller_remaining_tasks]
-  requires: [ceph-conf-controller]
-  version: 2.0.0
+  requires: [ceph-conf]
+  version: 2.1.0
   condition: "settings:external-ceph.cinder_ceph.value == true"
   parameters:
     puppet_manifest: volumes-controller.pp
@@ -40,8 +40,8 @@
   type: puppet
   groups: [primary-controller]
   required_for: [deploy_end, controller_remaining_tasks]
-  requires: [ceph-conf-controller, ceph-volumes-controller]
-  version: 2.0.0
+  requires: [ceph-volumes-controller]
+  version: 2.1.0
   condition: "settings:external-ceph.cinder_ceph.value == true"
   parameters:
     puppet_manifest: volumes-types.pp
@@ -52,8 +52,8 @@
   type: puppet
   groups: [compute]
   required_for: [deploy_end]
-  requires: [top-role-compute, ceph-conf-compute]
-  version: 2.0.0
+  requires: [ceph-conf]
+  version: 2.1.0
   condition: "settings:external-ceph.cinder_ceph.value == true"
   parameters:
     puppet_manifest: volumes-and-ephemeral-compute.pp
@@ -64,8 +64,8 @@
   type: puppet
   groups: [primary-controller, controller]
   required_for: [deploy_end, controller_remaining_tasks]
-  requires: [ceph-conf-controller]
-  version: 2.0.0
+  requires: [ceph-conf]
+  version: 2.1.0
   condition: "settings:external-ceph.glance_ceph.value == true"
   parameters:
     puppet_manifest: images.pp
@@ -76,8 +76,8 @@
   type: puppet
   groups: [primary-controller, controller]
   required_for: [deploy_end, controller_remaining_tasks]
-  requires: [ceph-conf-controller]
-  version: 2.0.0
+  requires: [ceph-conf]
+  version: 2.1.0
   condition: "settings:external-ceph.external_radosgw.value == true"
   parameters:
     puppet_manifest: radosgw-keystone.pp
@@ -85,87 +85,112 @@
     timeout: 3600
 
 
-# Re-define swift tasks with plugin conditions
-- id: swift
+# Re-define library tasks with plugin conditions
+- id: swift-proxy_storage
   type: puppet
-  version: 2.0.0
-  groups: [controller]
+  version: 2.1.0
+  groups: [primary-controller, controller]
   required_for: [deploy_end, controller_remaining_tasks]
-  requires: [openstack-controller]
-  cross-depends:
-    - name: primary-swift
-  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/swift.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 3600
-  test_pre:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/swift_pre.rb
-  test_post:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/swift_post.rbo
-
-- id: primary-swift
-  type: puppet
-  version: 2.0.0
-  groups: [primary-controller]
-  required_for: [deploy_end, controller_remaining_tasks]
-  requires: [openstack-controller]
+  requires: [openstack-controller, primary-rabbitmq, rabbitmq, memcached]
+  condition:
+    yaql_exp: &swift_enabled >
+      ((not $.get('external-ceph').external_radosgw or not $.get('external-ceph').glance_ceph or
+        not $.storage.objects_ceph or not $.storage.images_ceph) and
+       not $.storage.images_vcenter) and
+      (changedAny($.network_scheme, $.network_metadata, $.swift,
+        $.get('swift_master_role', 'primary-controller'),
+        $.get('swift_object_roles'), ('primary-controller' in $.roles),
+        $.get('swift_proxy_roles'), $.get('memcached_addresses'),
+        $.network_metadata.nodes.values().where(
+          ('controller' in $.node_roles) or
+          ('primary-controller' in $.node_roles)),
+        $.get('proxy_port'), $.storage, $.debug, $.get('verbose'),
+        $.get('swift_ring_min_part_hours'), $.get('deploy_swift_proxy'),
+        $.get('use_ssl'), $.rabbit,
+        $.network_metadata.nodes.values().where(
+          $.node_roles.any($.matches('controller'))).network_roles.select(
+            $.get('mgmt/messaging')), $.get('amqp_hosts'),
+        $.get('memcache_server_port'), $.ceilometer.enabled, $.mp,
+        $.get('swift_partition'), $.get('deploy_swift_storage')))
   cross-depends:
     - name: /(primary-)?rabbitmq/
+      role: self
+    - name: /glance/
+      role: self
     - name: swift-keystone
     - name: memcached
-  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
+      role: self
+    - name: /(primary-)?swift-proxy/
+      role: primary-controller
+    - name: ceilometer-controller
+      role: self
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/swift.pp
+    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/swift/proxy_storage.pp
     puppet_modules: /etc/puppet/modules
     timeout: 3600
   test_pre:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/swift_pre.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/swift/swift_pre.rb
   test_post:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/swift_post.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/swift/swift_post.rb
 
 - id: swift-rebalance-cron
   type: puppet
-  version: 2.0.0
+  version: 2.1.0
   groups: [primary-controller, controller]
   required_for: [deploy_end]
-  requires: [primary-swift, swift]
+  requires: [swift-proxy_storage]
+  condition:
+    yaql_exp: >
+      ((not $.get('external-ceph').external_radosgw or not $.get('external-ceph').glance_ceph or
+        not $.storage.objects_ceph or not $.storage.images_ceph) and
+       not $.storage.images_vcenter) and
+      (changedAny($.storage, $.get('swift_master_role', 'primary-controller'),
+        $.get('swift_ring_min_part_hours'),('primary-controller' in $.roles)))
   cross-depends:
-    - name: /(primary-)?swift/
+    - name: /(primary-)?swift-proxy/
       role: self
-  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/rebalance_cronjob.pp
+    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/swift/rebalance_cronjob.pp
     puppet_modules: /etc/puppet/modules
     timeout: 300
   test_pre:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/swift_post.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/swift/swift_post.rb
   test_post:
-    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/swift/rebalance_cronjob_post.rb
+    cmd: ruby /etc/puppet/modules/openstack_tasks/examples/swift/rebalance_cronjob_post.rb
 
 - id: swift-keystone
   type: puppet
-  version: 2.0.0
+  version: 2.1.0
   groups: [primary-controller]
-  required_for: [primary-swift]
+  required_for: [swift-proxy_storage]
+  condition:
+    yaql_exp: >
+      ((not $.get('external-ceph').external_radosgw or not $.get('external-ceph').glance_ceph or
+        not $.storage.objects_ceph or not $.storage.images_ceph) and
+       not $.storage.images_vcenter) and
+      (changedAny($.swift, $.network_metadata.vips,
+        $.get('region', 'RegionOne'), $.public_ssl, $.get('use_ssl')))
   cross-depends:
     - name: keystone
+      role: self
   requires: [primary-keystone, keystone]
-  condition: "settings:external-ceph.external_radosgw.value == false or settings:external-ceph.glance_ceph.value == false"
   parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/swift/keystone.pp
+    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/swift/keystone.pp
     puppet_modules: /etc/puppet/modules
     timeout: 1800
 
-- id: create-cinder-types
-  type: puppet
-  version: 2.0.0
-  groups: [primary-controller]
-  requires: [openstack-cinder]
-  required_for: [deploy_end]
-  condition: "settings:external-ceph.cinder_ceph.value == false"
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/openstack-cinder/create_cinder_types.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 1200
-
+- id: ceilometer-radosgw-user
+  type: skipped
+  version: 2.1.0
+  role: [primary-controller, controller]
+#  requires: [post_deployment_start, enable_rados]
+#  required_for: [post_deployment_end]
+#  condition:
+#    yaql_exp: >
+#      ($.ceilometer.enabled and $.storage.objects_ceph) and
+#       (changedAny($.ceilometer.enabled, $.storage.objects_ceph))
+#  parameters:
+#    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/ceilometer/radosgw_user.pp
+#    puppet_modules: /etc/puppet/modules
+#    timeout: 300
+#    cwd: /
