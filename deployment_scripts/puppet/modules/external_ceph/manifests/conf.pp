@@ -19,8 +19,6 @@ class external_ceph::conf {
   $glance_key         = pick($external_ceph['glance_key'], false)
 
   $nova_ceph          = pick($external_ceph['nova_ceph'], true)
-  $nova_user          = pick($external_ceph['nova_user'], false)
-  $nova_key           = pick($external_ceph['nova_key'], false)
 
   $cinder_backup_key  = pick($external_ceph['cinder_backup_key'], false)
   $cinder_backup_user = pick($external_ceph['cinder_backup_user'], false)

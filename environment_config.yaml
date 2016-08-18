@@ -147,24 +147,6 @@ attributes:
     restrictions:
       - condition: "settings:external-ceph.cinder_ceph.value == false"
         message: "External Ceph for Cinder volumes is not enabled"
-  nova_user:
-    value: 'nova'
-    label: 'Ceph User for Nova'
-    description: 'Username that Nova is going to use to access Ceph'
-    weight: 50
-    type: 'text'
-    restrictions:
-      - condition: "settings:external-ceph.nova_ceph.value == false"
-        message: "External Ceph for Nova ephemeral drives is not enabled"
-  nova_key:
-    value: ''
-    label: 'Ceph Key for Nova'
-    description: 'Key that Nova is going to use to access Ceph'
-    weight: 55
-    type: 'password'
-    restrictions:
-      - condition: "settings:external-ceph.nova_ceph.value == false"
-        message: "External Ceph for Nova ephemeral drives is not enabled"
   nova_pool:
     value: 'compute'
     label: 'Ceph Pool Name for Nova'
