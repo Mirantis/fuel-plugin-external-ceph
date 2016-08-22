@@ -1,4 +1,4 @@
-external-ceph-1.0.2
+external-ceph-2.0.1
 ============
 
 Overview
@@ -8,7 +8,7 @@ This plugin allowes to use external Ceph cluster for storage of Volumes, Images,
 
 Requirements
 ------------
-Currently compatible only with Mirantis OpenStack 8.0.
+Currently compatible only with Mirantis OpenStack 9.0.
 
 
 Prerequisites
@@ -21,7 +21,7 @@ The user should also consider using high-bandwidth links for communication with 
 
 Limitations
 -----------
-- As of 8.0 this plugin is indended to support configuring all storage to use external Ceph (Volumes, Images, Objects, Ephemeral). Other combinations of storage backends may have not been tested.
+- As of 9.0 this plugin is indended to support configuring all storage to use external Ceph (Volumes, Images, Objects, Ephemeral). Other combinations of storage backends may have not been tested.
 - User must configure RadosGW to use OpenStack environment's Keystone for authentication before using Object Storage.
 
 
