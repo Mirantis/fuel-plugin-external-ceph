@@ -11,18 +11,6 @@
     puppet_manifest: conf.pp
     puppet_modules: /etc/puppet/modules:puppet/modules
     timeout: 3600
-#
-#- id: ceph-conf-compute
-#  type: puppet
-#  groups: [compute]
-#  required_for: [deploy_end]
-#  requires: [top-role-compute]
-#  version: 2.1.0
-#  condition: "settings:external-ceph.cinder_ceph.value == true or settings:external-ceph.nova_ceph.value == true or settings:external-ceph.glance_ceph.value == true"
-#  parameters:
-#    puppet_manifest: conf.pp
-#    puppet_modules: /etc/puppet/modules:puppet/modules
-#    timeout: 3600
 
 - id: ceph-volumes-controller
   type: puppet
@@ -51,8 +39,8 @@
 - id: ceph-volumes-and-ephemeral-compute
   type: puppet
   groups: [compute]
-  required_for: [deploy_end]
-  requires: [ceph-conf]
+  required_for: [enable_nova_compute_service]
+  requires: [ceph-conf, top-role-compute]
   version: 2.1.0
   condition: "settings:external-ceph.cinder_ceph.value == true"
   parameters:
@@ -183,14 +171,3 @@
   type: skipped
   version: 2.1.0
   role: [primary-controller, controller]
-#  requires: [post_deployment_start, enable_rados]
-#  required_for: [post_deployment_end]
-#  condition:
-#    yaql_exp: >
-#      ($.ceilometer.enabled and $.storage.objects_ceph) and
-#       (changedAny($.ceilometer.enabled, $.storage.objects_ceph))
-#  parameters:
-#    puppet_manifest: /etc/puppet/modules/openstack_tasks/examples/ceilometer/radosgw_user.pp
-#    puppet_modules: /etc/puppet/modules
-#    timeout: 300
-#    cwd: /

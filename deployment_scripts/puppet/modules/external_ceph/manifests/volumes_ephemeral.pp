@@ -19,8 +19,7 @@ class external_ceph::volumes_ephemeral {
 
 
   service { "$nova::params::compute_service_name":
-    enable => true,
-    ensure => running,
+    ensure => stopped,
   }
 
 
@@ -42,6 +41,6 @@ class external_ceph::volumes_ephemeral {
     require => [],
   }
 
-  Package['ceph-client-package'] -> Nova_config<||> ~> Service["${nova::params::compute_service_name}"]
+  Package['ceph-client-package'] -> Nova_config<||> # ~> Service["${nova::params::compute_service_name}"]
 
 }
